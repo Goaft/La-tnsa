@@ -18,14 +18,12 @@ const Voice = {
   enabled: true, rate: 0.9, voice: null, primed: false,
   init() {
     if (!("speechSynthesis" in window)) { this.enabled = false; return; }
-    const pick = () => { const v = speechSynthesis.getVoices(); this.voice = v.find(x => x.lang.startsWith("ar")) || null; };
-    pick(); speechSynthesis.onvoiceschanged = pick;
-    ["click","touchstart"].forEach(ev => document.addEventListener(ev, () => this.prime(), { once:true, passive:true }));
-  },
-  prime() {
-    if (this.primed || !this.enabled) return;
-    this.primed = true;
-    try { const u = new SpeechSynthesisUtterance(""); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
+    const pick = () => { 
+      const v = speechSynthesis.getVoices(); 
+      this.voice = v.find(x => x.lang.startsWith("ar")) || null; 
+    };
+    pick(); 
+    speechSynthesis.onvoiceschanged = pick;
   },
   speak(text, opts = {}) {
     if (!this.enabled || !text) return;
@@ -77,7 +75,18 @@ const H = {
     return "bad";
   },
   dateStr(ts) { if (!ts) return ""; return new Date(ts).toLocaleDateString("ar-EG", { day:"numeric", month:"short", year:"numeric" }); },
-  timeStr(ts) { if (!ts) return ""; return new Date(ts).toLocaleTimeString("ar-EG", { hour:"2-digit", minute:"2-digit" }); },
+  // إصلاح صيغة الوقت لتكون موحدة ومقروءة
+  timeStr(ts) { 
+    if (!ts) return ""; 
+    const d = new Date(ts);
+    let hours = d.getHours();
+    let minutes = d.getMinutes();
+    const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${hours}:${minutes} ${ampm}`;
+  },
   hijriMonth() {
     try {
       const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { month:'numeric' }).formatToParts(new Date());
