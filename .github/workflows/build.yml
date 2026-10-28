@@ -41,6 +41,16 @@ jobs:
       - name: Copy Web Assets
         run: npx cap copy android
 
+      - name: Configure Android Manifest & Gradle
+        run: |
+          # حقن الصلاحيات
+          sed -i 's|</manifest>|<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n<uses-permission android:name="android.permission.USE_EXACT_ALARM" />\n<uses-permission android:name="android.permission.VIBRATE" />\n<uses-permission android:name="android.permission.WAKE_LOCK" />\n<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />\n</manifest>|' android/app/src/main/AndroidManifest.xml
+          
+          # ضبط إصدارات الأندرويد (من 7 إلى 16)
+          sed -i 's/minSdkVersion = [0-9]*/minSdkVersion = 24/' android/variables.gradle
+          sed -i 's/targetSdkVersion = [0-9]*/targetSdkVersion = 34/' android/variables.gradle
+          sed -i 's/compileSdkVersion = [0-9]*/compileSdkVersion = 34/' android/variables.gradle
+
       - name: Build APK
         run: |
           cd android
