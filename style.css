@@ -1,0 +1,701 @@
+/* ==========================================
+   نظام الألوان والمتغيرات (The Design System)
+   ========================================== */
+:root {
+  /* ألوان الوضع النهاري */
+  --bg: #f2f6f3;
+  --bg-gradient: linear-gradient(135deg, #f2f6f3 0%, #e0ebe4 100%);
+  --card: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(255, 255, 255, 0.6);
+  --ink: #1b2a1f;
+  --muted: #6b7a70;
+  
+  /* الألوان الأساسية */
+  --primary: #2e7d32;
+  --primary-light: #4caf50;
+  --blue: #1565c0;
+  --pink: #c2185b;
+  --orange: #f57c00;
+  --red: #d32f2f;
+  --gold: #fbc02d;
+  
+  /* ظلال وتأثيرات */
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow-soft: 0 8px 24px rgba(27, 42, 31, 0.06);
+  --shadow-float: 0 12px 32px rgba(27, 42, 31, 0.12);
+  --glass-blur: blur(12px);
+}
+
+/* الوضع الليلي الفخم */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0e0c;
+    --bg-gradient: linear-gradient(135deg, #0b0e0c 0%, #141a15 100%);
+    --card: rgba(28, 34, 28, 0.75);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --ink: #f0f2eb;
+    --muted: #8c9e92;
+    
+    --primary: #4caf50;
+    --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ==========================================
+   الأساسيات (Base & Typography)
+   ========================================== */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: "Segoe UI", "Noto Naskh Arabic", Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.7;
+  font-weight: 500;
+  min-height: 100dvh;
+  transition: background 0.3s ease;
+}
+
+body {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+/* ==========================================
+   الهيدر (Header)
+   ========================================== */
+#appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(16px + env(safe-area-inset-top)) 20px 16px;
+  background: rgba(46, 125, 50, 0.85);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#appHeader h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#btnSettings {
+  background: rgba(255,255,255,0.2);
+  border: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s;
+}
+#btnSettings:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+
+/* ==========================================
+   الحاوية الرئيسية والشاشات (Main & Screens)
+   ========================================== */
+#appMain {
+  padding: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.screen { display: none; }
+.screen.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 { margin: 8px 0 20px; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+h3 { margin: 20px 0 14px; font-size: 18px; color: var(--primary); font-weight: 700; }
+.hint { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+.now-header { font-weight: 800; margin: 16px 0; color: var(--primary); font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.hidden { display: none !important; }
+
+/* ==========================================
+   البطاقات (Cards)
+   ========================================== */
+.tip-card, .task-card, .last-done, .appointment-item, .kid-card, .routine-slot, .parenting-card {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* تأثير الزجاج لبطاقة النصيحة */
+.tip-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(240,248,240,0.8));
+  border-right: 6px solid var(--primary);
+}
+@media (prefers-color-scheme: dark) {
+  .tip-card { background: linear-gradient(145deg, rgba(30,43,32,0.9), rgba(25,35,26,0.8)); }
+}
+
+.tip-card .tip-label {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* شريط النسيان (التنبيهات) */
+.forget-banner {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: #fff;
+  padding: 20px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: pulseGlow 2s infinite;
+}
+.forget-banner::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg); animation: shine 3s infinite;
+}
+@keyframes shine { 100% { left: 200%; } }
+@keyframes pulseGlow { 0%, 100% { box-shadow: 0 8px 24px rgba(220,38,38,0.3); } 50% { box-shadow: 0 8px 32px rgba(220,38,38,0.5); } }
+
+.forget-banner .fb-title { font-weight: 800; font-size: 18px; margin-bottom: 6px; }
+.forget-banner .fb-body { font-size: 15px; opacity: 0.9; }
+
+/* ==========================================
+   المهام (Tasks)
+   ========================================== */
+.task-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-right: 5px solid var(--blue);
+}
+.task-card.priority-high { border-right-color: var(--red); }
+.task-card.priority-med { border-right-color: var(--orange); }
+.task-card.done { opacity: 0.5; filter: grayscale(1); }
+
+.task-check {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid var(--blue);
+  background: transparent; cursor: pointer; flex-shrink: 0;
+  appearance: none; -webkit-appearance: none; position: relative;
+  transition: all 0.2s ease;
+}
+.task-check:checked {
+  background: var(--blue); border-color: var(--blue);
+  transform: scale(1.1);
+}
+.task-check:checked::after {
+  content: "✓"; color: #fff; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.2); font-size: 18px; font-weight: 900;
+}
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-weight: 700; font-size: 17px; margin-bottom: 4px; color: var(--ink); }
+.task-meta { font-size: 13px; color: var(--muted); font-weight: 600; }
+.task-actions { display: flex; gap: 6px; }
+.task-actions button {
+  background: rgba(0,0,0,0.04); border: 0; border-radius: 50%; width: 38px; height: 38px;
+  font-size: 16px; cursor: pointer; color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+.task-actions button:active { transform: scale(0.9); background: rgba(0,0,0,0.1); }
+@media (prefers-color-scheme: dark) {
+  .task-actions button { background: rgba(255,255,255,0.08); }
+}
+
+/* ==========================================
+   المواعيد (Appointments)
+   ========================================== */
+.appointment-item { display: flex; justify-content: space-between; align-items: center; border-right: 6px solid var(--blue); }
+.appointment-item.meds { border-right-color: var(--red); }
+.appointment-item.birthday { border-right-color: var(--gold); }
+.appointment-item.anniversary { border-right-color: var(--pink); }
+.appointment-info h4 { margin: 0 0 6px; font-size: 17px; font-weight: 800; color: var(--ink); }
+.appointment-info p { margin: 0; font-size: 14px; color: var(--muted); font-weight: 600; }
+.appointment-actions button {
+  background: rgba(0,0,0,0.04); color: var(--ink); border: 0; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 16px; transition: transform 0.2s;
+}
+.appointment-actions button:active { transform: scale(0.9); }
+
+/* ==========================================
+   العائلة (Family Wheel)
+   ========================================== */
+.last-done {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  border-right: 6px solid var(--muted);
+}
+.last-done.ok { border-right-color: var(--primary-light); }
+.last-done.warn { border-right-color: var(--gold); }
+.last-done.bad { border-right-color: var(--red); }
+.last-done .label { font-weight: 800; font-size: 16px; }
+.last-done .status { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 4px; }
+.last-done button {
+  background: var(--primary); color: #fff; border: 0; padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; font-size: 14px;
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3); transition: transform 0.2s;
+}
+.last-done button:active { transform: scale(0.95); }
+
+/* ==========================================
+   الأزرار (Buttons)
+   ========================================== */
+.btn-add {
+  display: block; width: 100%; padding: 18px; margin-top: 20px;
+  background: rgba(46, 125, 50, 0.05); color: var(--primary);
+  border: 2px dashed rgba(46, 125, 50, 0.4); border-radius: var(--radius);
+  font-size: 17px; cursor: pointer; font-weight: 800; transition: all 0.3s;
+}
+.btn-add:active { background: rgba(46, 125, 50, 0.1); transform: scale(0.98); }
+@media (prefers-color-scheme: dark) { .btn-add { background: rgba(76, 175, 80, 0.1); border-color: rgba(76, 175, 80, 0.3); } }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: #fff; border: 0; padding: 14px 24px; border-radius: var(--radius-sm);
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 6px 16px rgba(46, 125, 50, 0.3); transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:active { transform: translateY(2px) scale(0.98); box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3); }
+
+.speak-btn {
+  margin-top: 12px; background: rgba(46, 125, 50, 0.08); border: 1px solid rgba(46, 125, 50, 0.2);
+  color: var(--primary); border-radius: 20px; padding: 8px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;
+}
+.speak-btn:active { background: rgba(46, 125, 50, 0.2); }
+
+/* ==========================================
+   البطاقات السريعة (Quick Cards)
+   ========================================== */
+.quick-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+.quick-card {
+  background: var(--card); padding: 24px 16px; border-radius: var(--radius);
+  box-shadow: var(--shadow-soft); cursor: pointer; text-align: center;
+  border: 1px solid var(--card-border); font-size: 16px; color: var(--ink); font-weight: 800;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.quick-card:active { transform: scale(0.95); box-shadow: var(--shadow-float); }
+.quick-card .qc-icon { font-size: 36px; display: block; margin-bottom: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+
+/* ==========================================
+   شريط التنقل السفلي (Bottom Nav)
+   ========================================== */
+#bottomNav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  display: flex; background: var(--card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--card-border);
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+}
+#bottomNav button {
+  flex: 1; background: none; border: 0; padding: 8px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 22px; cursor: pointer; color: var(--muted); transition: all 0.3s;
+}
+#bottomNav button.active { color: var(--primary); transform: translateY(-2px); }
+#bottomNav button.active span { font-weight: 800; }
+#bottomNav button span { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+
+/* ==========================================
+   النوافذ المنبثقة (Modal & Dialog)
+   ========================================== */
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 100;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease forwards;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal.hidden { display: none; }
+
+.modal-box {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 24px;
+  width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.modal-box h3 { margin-top: 0; font-size: 22px; margin-bottom: 24px; color: var(--ink); text-align: center; }
+.modal-box label { display: block; margin: 16px 0 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
+.modal-box input, .modal-box select, .modal-box textarea {
+  width: 100%; padding: 16px; font-size: 16px; border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm); background: var(--bg); color: var(--ink); font-family: inherit; transition: border 0.2s;
+}
+.modal-box input:focus { border-color: var(--primary); }
+@media (prefers-color-scheme: dark) { .modal-box input, .modal-box select { border-color: rgba(255,255,255,0.1); } }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; }
+.modal-actions button {
+  padding: 14px 24px; border-radius: var(--radius-sm); font-size: 16px; font-weight: 800;
+  border: 0; cursor: pointer; transition: transform 0.2s;
+}
+.modal-actions button:first-child { background: rgba(0,0,0,0.05); color: var(--ink); }
+.modal-actions button:active { transform: scale(0.95); }
+@media (prefers-color-scheme: dark) { .modal-actions button:first-child { background: rgba(255,255,255,0.1); } }
+
+/* ==========================================
+   التنبيهات المؤقتة (Toast)
+   ========================================== */
+.toast {
+  position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+  background: rgba(27, 42, 31, 0.95); color: #fff;
+  backdrop-filter: blur(10px);
+  padding: 14px 24px; border-radius: 30px;
+  z-index: 200; font-size: 15px; font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 90vw; text-align: center;
+  animation: slideUp 0.3s forwards;
+}
+.toast.hidden { display: none; }
+
+/* ==========================================
+   شاشات إضافية (Routine, Kids, etc.)
+   ========================================== */
+.routine-slot { display: flex; align-items: center; gap: 16px; border-right: 6px solid var(--blue); }
+.routine-slot.current { border-right-color: var(--primary); background: rgba(46, 125, 50, 0.05); transform: scale(1.02); }
+.routine-slot .rs-time { font-weight: 800; color: var(--primary); min-width: 70px; font-size: 17px; }
+.routine-slot .rs-activity { flex: 1; font-weight: 600; font-size: 16px; }
+.routine-slot .rs-actions button { background: none; border: 0; cursor: pointer; font-size: 18px; color: var(--muted); padding: 4px; }
+
+.kid-card .kc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+@media (prefers-color-scheme: dark) { .kid-card .kc-head { border-bottom-color: rgba(255,255,255,0.05); } }
+.kid-card .kc-name { font-weight: 800; font-size: 20px; }
+.kid-card .kc-points { background: linear-gradient(135deg, #fbc02d, #f57c00); color: #fff; padding: 8px 18px; border-radius: 30px; font-weight: 800; font-size: 16px; box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3); }
+.kid-card .kc-status { font-size: 14px; padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-weight: 700; }
+.kid-card .kc-status.ok { background: rgba(76, 175, 80, 0.1); color: #2e7d32; }
+.kid-card .kc-status.warn { background: rgba(251, 192, 45, 0.1); color: #f57c00; }
+.kid-card .kc-status.bad { background: rgba(211, 47, 47, 0.1); color: #d32f2f; }
+@media (prefers-color-scheme: dark) { .kid-card .kc-status.ok { color: #81c784; } .kid-card .kc-status.warn { color: #ffb74d; } .kid-card .kc-status.bad { color: #e57373; } }
+
+.kid-card .kc-task { display: flex; align-items: center; gap: 12px; padding: 12px 0; font-size: 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+@media (prefers-color-scheme: dark) { .kid-card .kc-task { border-bottom-color: rgba(255,255,255,0.05); } }
+.kid-card .kc-actions { display: flex; gap: 10px; margin-top: 20px; }
+.kid-card .kc-actions button { flex: 1; padding: 14px; border: 1px solid rgba(0,0,0,0.08); background: var(--bg); border-radius: var(--radius-sm); cursor: pointer; font-size: 15px; font-weight: 800; color: var(--ink); transition: background 0.2s; }
+.kid-card .kc-actions button:active { background: rgba(0,0,0,0.1); }
+/* ==========================================
+   زر الهيدر المشترك
+   ========================================== */
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s;
+}
+.header-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+
+/* ==========================================
+   رقاقة اللحظة
+   ========================================== */
+.moment-chip {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  transform: translate(-50%, 20px) scale(.9);
+  background: linear-gradient(135deg, #fff8e1, #ffe0b2);
+  border: 1px solid rgba(251,192,45,.5);
+  box-shadow: 0 8px 24px rgba(245,124,0,.25);
+  border-radius: 30px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: #6d4c00;
+  font-size: 14px;
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s cubic-bezier(.16,1,.3,1);
+  max-width: 92vw;
+}
+.moment-chip.visible { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
+.mc-emoji { font-size: 18px; animation: sparkle 1.4s infinite; }
+@keyframes sparkle { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2) rotate(8deg); } }
+.mc-text { cursor: pointer; }
+.mc-skip { background: none; border: 0; font-size: 14px; color: #a07a1a; cursor: pointer; padding: 4px; }
+
+.moment-input-host {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 95;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn .2s;
+}
+.moment-input {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  gap: 10px;
+  background: var(--card);
+  padding: 14px;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  animation: slideUp .25s cubic-bezier(.16,1,.3,1);
+}
+.moment-input input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,.08);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  font-family: inherit;
+}
+.moment-input input:focus { border-color: var(--gold); }
+
+/* ==========================================
+   جدار الأثر
+   ========================================== */
+.pulse-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(240,248,240,.8));
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-soft);
+}
+@media (prefers-color-scheme: dark) {
+  .pulse-card { background: linear-gradient(145deg, rgba(30,43,32,.9), rgba(25,35,26,.8)); }
+}
+.pulse-emoji { font-size: 44px; line-height: 1; }
+.pulse-title { font-weight: 800; font-size: 17px; }
+.pulse-hint { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+.journal-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
+.jf-chip {
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .2s;
+}
+.jf-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.athar-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+}
+.ac-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.ac-body { flex: 1; min-width: 0; }
+.ac-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ac-subject { font-weight: 800; font-size: 15px; color: var(--ink); }
+.ac-time { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.ac-memory {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(251,192,45,.1);
+  border-right: 3px solid var(--gold);
+  border-radius: 8px;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.ac-add-moment {
+  margin-top: 8px;
+  background: none;
+  border: 1px dashed rgba(0,0,0,.15);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.ac-add-moment:hover { color: var(--primary); border-color: var(--primary); }
+.ac-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* ==========================================
+   بصمة الأسبوع
+   ========================================== */
+.fp-host {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 300;
+  backdrop-filter: blur(6px);
+  animation: fadeIn .25s;
+  overflow-y: auto;
+}
+.fp-modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 20px 48px rgba(0,0,0,.4);
+  animation: slideUp .3s cubic-bezier(.16,1,.3,1);
+}
+
+/* ==========================================
+   إعدادات الإشعارات
+   ========================================== */
+.settings-section { margin-bottom: 20px; }
+.notif-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) { .notif-row { border-bottom-color: rgba(255,255,255,.06); } }
+.notif-label { font-weight: 700; font-size: 15px; }
+.notif-select {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 2px solid var(--card-border);
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+}
+.notif-warn {
+  background: rgba(211,47,47,.1);
+  color: var(--red);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   قوالب المهام
+   ========================================== */
+.template-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.template-chip {
+  background: rgba(46,125,50,.08);
+  border: 1px solid rgba(46,125,50,.2);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.template-chip:hover, .template-chip:active {
+  background: rgba(46,125,50,.18);
+  transform: scale(.97);
+}
+
+/* ==========================================
+   بطاقات المكافآت (كانت مفقودة!)
+   ========================================== */
+.kc-tasks { margin: 14px 0; }
+.kc-rewards { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.kc-reward {
+  background: linear-gradient(135deg, #fbc02d, #f57c00);
+  color: #fff;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(245,124,0,.3);
+  transition: transform .2s;
+  font-family: inherit;
+}
+.kc-reward:active { transform: scale(.95); }
+
+/* ==========================================
+   بطاقة تربوية
+   ========================================== */
+.parenting-card {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-soft);
+}
+.parenting-card h3 { margin-top: 0; }
