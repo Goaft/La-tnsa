@@ -780,51 +780,57 @@ const UI = {
   },
 
   renderNotifSettings() {
-    const el = document.getElementById("notifSettings");
-    if (!el) return;
-    const perm = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
-    let html = "";
+  const el = document.getElementById("notifSettings");
+  if (!el) return;
+  
+  // الكشف الذكي: هل نحن داخل تطبيق أندرويد أم متصفح؟
+  const isNative = typeof Capacitor !== "undefined" && Capacitor.isNativePlatform();
+  let html = "";
 
+  if (isNative) {
+    // داخل التطبيق الأصلي: الإشعارات مدعومة دائماً ولن تظهر رسالة الخطأ
+    html += `<div style="text-align:center;color:var(--primary);font-weight:800;padding:10px 0;">✓ التطبيق جاهز للإشعارات</div>
+             <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px;">تأكد من السماح بالإشعارات عند فتح التطبيق.</p>`;
+  } else {
+    // داخل المتصفح: نتحقق من إذن المتصفح
+    const perm = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
     if (perm === "denied") {
-      html += `<div class="notif-warn">⚠️ الإشعارات مرفوضة من المتصفح.<br>فعّلها من: إعدادات الموقع ← الإشعارات.</div>`;
+      html += `<div class="notif-warn">⚠️ الإشعارات مرفوضة من المتصفح.</div>`;
     } else if (perm !== "granted") {
-      html += `<button class="btn-primary" id="btnReqPerm" style="width:100%;margin-bottom:12px;">تفعيل الإشعارات على الهاتف</button>`;
+      html += `<button class="btn-primary" id="btnReqPerm" style="width:100%;margin-bottom:12px;">تفعيل الإشعارات</button>`;
     } else {
       html += `<div style="text-align:center;color:var(--primary);font-weight:800;padding:10px 0;">✓ الإشعارات مفعّلة</div>`;
     }
+  }
 
-    Object.entries(Notifications.categories).forEach(([key, cat]) => {
-      const lvl = Notifications.categoryLevel(key);
-      html += `
-        <div class="notif-row">
-          <div class="notif-label">${H.escape(cat.label)}</div>
-          <select data-cat="${H.escape(key)}" class="notif-select">
-            <option value="quiet"  ${lvl==="quiet"?"selected":""}>🟢 هادئ</option>
-            <option value="normal" ${lvl==="normal"?"selected":""}>🟡 عادي</option>
-            <option value="strict" ${lvl==="strict"?"selected":""}>🔴 صارم</option>
-          </select>
-        </div>`;
+  Object.entries(Notifications.categories).forEach(([key, cat]) => {
+    const lvl = Notifications.categoryLevel(key);
+    html += `
+      <div class="notif-row">
+        <div class="notif-label">${H.escape(cat.label)}</div>
+        <select data-cat="${H.escape(key)}" class="notif-select">
+          <option value="quiet"  ${lvl==="quiet"?"selected":""}>🟢 هادئ</option>
+          <option value="normal" ${lvl==="normal"?"selected":""}>🟡 عادي</option>
+          <option value="strict" ${lvl==="strict"?"selected":""}>🔴 صارم</option>
+        </select>
+      </div>`;
+  });
+
+  el.innerHTML = html;
+  el.querySelector("#btnReqPerm")?.addEventListener("click", async () => {
+    if (await Notifications.requestPermission()) this.renderNotifSettings();
+  });
+  el.querySelectorAll(".notif-select").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const s = Store.get("notifLevels", {}) || {};
+      s[sel.dataset.cat] = sel.value;
+      Store.set("notifLevels", s);
+      if (typeof NativeBridge !== "undefined") NativeBridge.syncFromStorage();
+      Notifications.syncAll();
+      Notify.toast("حُفظ");
     });
-
-    el.innerHTML = html;
-
-    el.querySelector("#btnReqPerm")?.addEventListener("click", async () => {
-      if (await Notifications.requestPermission()) {
-        Notifications.syncAll();
-        this.renderNotifSettings();
-      }
-    });
-
-    el.querySelectorAll(".notif-select").forEach(sel => {
-      sel.addEventListener("change", () => {
-        const s = Store.get("notifLevels", {}) || {};
-        s[sel.dataset.cat] = sel.value;
-        Store.set("notifLevels", s);
-        Notifications.syncAll();
-        Notify.toast("حُفظ");
-      });
-    });
-  },
+  });
+},
 
   exportData() {
     const data = {};
