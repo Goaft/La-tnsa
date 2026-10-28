@@ -10,14 +10,29 @@ const Notifications = {
   },
 
   async requestPermission() {
-    if (!("Notification" in window)) { Notify.toast("الجهاز لا يدعم الإشعارات"); return false; }
+    // 1. الكشف عن بيئة التطبيق الأصلي (Capacitor)
+    if (typeof Capacitor !== "undefined" && Capacitor.isNativePlatform()) {
+      try {
+        const { LocalNotifications } = Capacitor.Plugins;
+        const perm = await LocalNotifications.requestPermissions();
+        if (perm.display === "granted") {
+          Notify.toast("✓ الإشعارات مفعلة");
+          if (typeof NativeBridge !== "undefined") NativeBridge.syncFromStorage();
+          return true;
+        }
+      } catch(e) {}
+      return false;
+    }
+
+    // 2. متصفح الويب
+    if (!("Notification" in window)) { Notify.toast("المتصفح لا يدعم الإشعارات"); return false; }
     if (Notification.permission === "granted") return true;
     if (Notification.permission === "denied") {
       Notify.toast("الإشعارات مرفوضة — فعّلها من إعدادات الموقع");
       return false;
     }
     const p = await Notification.requestPermission();
-    if (p === "granted") { Notify.toast("✓ الإشعارات مفعّلة"); H.haptic([50,50,50]); }
+    if (p === "granted") { Notify.toast("✓ الإشعارات مفعلة"); H.haptic([50,50,50]); }
     return p === "granted";
   },
 
@@ -35,8 +50,9 @@ const Notifications = {
   _repeats: new Map(),
 
   async fire({ level, title, body, tag, kind, itemId, ts, actions = [] }) {
-    if (Notification.permission !== "granted") return false;
-    if (level === "quiet") return false;
+    if (typeof Capacitor !== "undefined" && Capacitor.isNativePlatform()) return false; // التطبيق الأصلي يتولى المهمة عبر NativeBridge
+    if (typeof Notification === "undefined" || Notification.permission !== "granted" || level === "quiet") return false;
+    
     const reg = await navigator.serviceWorker.getRegistration();
     const strict = level === "strict";
     const opts = {
@@ -86,6 +102,7 @@ const Notifications = {
     const t = setTimeout(tick, 5 * 60 * 1000);
     this._repeats.set(payload.tag, t);
   },
+  
   cancelRepeat(tag) {
     const t = this._repeats.get(tag);
     if (t) { clearTimeout(t); this._repeats.delete(tag); }
@@ -102,12 +119,15 @@ const Notifications = {
     const t = setTimeout(() => { fireFn(); this._timers.delete(key); }, Math.min(delay, 2147483647));
     this._timers.set(key, t);
   },
+  
   cancel(key) {
     const t = this._timers.get(key);
     if (t) { clearTimeout(t); this._timers.delete(key); }
   },
 
   syncAll() {
+    // إذا كنا في التطبيق الأصلي، نستخدم NativeBridge بدلاً من هذا
+    if (typeof Capacitor !== "undefined" && Capacitor.isNativePlatform()) return;
     if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
 
     Scheduler.getTodayEvents().forEach(item => {
