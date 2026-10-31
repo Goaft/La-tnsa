@@ -18,16 +18,28 @@ const Voice = {
   enabled: true, rate: 0.9, voice: null, primed: false,
   init() {
     if (!("speechSynthesis" in window)) { this.enabled = false; return; }
-    const pick = () => { 
-      const v = speechSynthesis.getVoices(); 
-      this.voice = v.find(x => x.lang.startsWith("ar")) || null; 
+    const pick = () => {
+      const v = speechSynthesis.getVoices();
+      this.voice = v.find(x => x.lang.startsWith("ar")) || null;
     };
-    pick(); 
+    pick();
     speechSynthesis.onvoiceschanged = pick;
   },
   speak(text, opts = {}) {
     if (!this.enabled || !text) return;
     try {
+      // استخدام محرك الصوت الأصلي في الأندرويد (Capacitor TextToSpeech)
+      if (typeof Capacitor !== "undefined" && Capacitor.isNativePlatform() && Capacitor.Plugins.TextToSpeech) {
+        Capacitor.Plugins.TextToSpeech.speak({
+          text: text,
+          lang: "ar-SA",
+          rate: opts.rate || this.rate,
+          volume: 1.0
+        });
+        return;
+      }
+      
+      // احتياطي للمتصفح
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "ar-SA"; u.rate = opts.rate || this.rate;
@@ -75,7 +87,8 @@ const H = {
     return "bad";
   },
   dateStr(ts) { if (!ts) return ""; return new Date(ts).toLocaleDateString("ar-EG", { day:"numeric", month:"short", year:"numeric" }); },
-  // إصلاح صيغة الوقت لتكون موحدة ومقروءة
+  
+  // توحيد صيغة الوقت (صباحاً / مساءً)
   timeStr(ts) { 
     if (!ts) return ""; 
     const d = new Date(ts);
@@ -87,6 +100,7 @@ const H = {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     return `${hours}:${minutes} ${ampm}`;
   },
+  
   hijriMonth() {
     try {
       const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { month:'numeric' }).formatToParts(new Date());
