@@ -5,20 +5,21 @@ const NativeBridge = {
     if (!this.isNative()) return;
     const { LocalNotifications } = Capacitor.Plugins;
 
-    // 1. إنشاء قناة الإشعارات (للصوت والاهتزاز)
+    // 1. إنشاء قناة "منبه صارم" (تتجاوز وضع الصامت وتظهر كـ Pop-up)
     try {
       await LocalNotifications.createChannel({
-        id: 'important_alerts',
-        name: 'تنبيهات هامة',
-        description: 'قناة الأدوية والمواعيد',
-        importance: 5, // Pop-up + Sound
-        visibility: 1, // Lock screen
+        id: 'strict_alarms',
+        name: 'منبهات صارمة',
+        description: 'تنبيهات الأدوية والمهام الهامة',
+        importance: 5, // 5 = MAX (صوت + اهتزاز + Pop-up)
+        visibility: 1, // 1 = يظهر على شاشة القفل
         sound: 'default',
-        vibration: true
+        vibration: true,
+        lights: true
       });
     } catch(e) { console.log("Channel error", e); }
 
-    // 2. طلب إذن الإشعارات تلقائياً
+    // 2. طلب إذن الإشعارات
     let permStatus = await LocalNotifications.checkPermissions();
     if (permStatus.display !== "granted") {
       await LocalNotifications.requestPermissions();
@@ -29,8 +30,8 @@ const NativeBridge = {
       types: [{
         id: "REMINDER_ACTIONS",
         actions: [
-          { id: "confirm", title: "أخذته ✓" },
-          { id: "snooze", title: "١٠ دقائق" }
+          { id: "confirm", title: "تم التنفيذ ✓" },
+          { id: "snooze", title: "تأجيل ٥ دقائق" }
         ]
       }]
     });
@@ -50,11 +51,13 @@ const NativeBridge = {
     if (!this.isNative()) return;
     const { LocalNotifications } = Capacitor.Plugins;
 
+    // إلغاء الإشعارات القديمة
     await LocalNotifications.cancel({ notifications: (await LocalNotifications.getPending()).notifications });
     
     const pending = [];
     let idCounter = 1;
 
+    // جدولة الأدوية والمواعيد
     if (typeof Scheduler !== "undefined") {
       Scheduler.getTodayEvents().forEach(item => {
         if (item.ts <= Date.now() || item.time === "طوال اليوم") return;
@@ -62,10 +65,14 @@ const NativeBridge = {
 
         pending.push({
           id: idCounter++,
-          title: "💊 " + item.event.title,
-          body: `موعد ${item.time} — هل أخذته؟`,
-          schedule: { at: new Date(item.ts), allowWhileIdle: true },
-          channelId: 'important_alerts',
+          title: "🚨 تنبيه عاجل: " + item.event.title,
+          body: `موعد ${item.time} — اضغط هنا لتأكيد الأخذ.`,
+          schedule: { 
+            at: new Date(item.ts), 
+            allowWhileIdle: true, // يعمل حتى لو الهاتف نائم
+            exact: true // دقة بالثانية
+          },
+          channelId: 'strict_alarms',
           sound: 'default',
           actionTypeId: "REMINDER_ACTIONS",
           extra: { kind: "event", itemId: item.event.id, ts: item.ts }
@@ -73,15 +80,20 @@ const NativeBridge = {
       });
     }
 
+    // جدولة المهام
     if (typeof Store !== "undefined") {
       (Store.get("tasks", []) || []).forEach(t => {
         if (t.done || !t.due || t.due <= Date.now()) return;
         pending.push({
           id: idCounter++,
-          title: "✅ " + t.title,
-          body: "حان موعد المهمة",
-          schedule: { at: new Date(t.due), allowWhileIdle: true },
-          channelId: 'important_alerts',
+          title: "🚨 مهمة: " + t.title,
+          body: "حان موعد هذه المهمة الآن.",
+          schedule: { 
+            at: new Date(t.due), 
+            allowWhileIdle: true, 
+            exact: true 
+          },
+          channelId: 'strict_alarms',
           sound: 'default',
           actionTypeId: "REMINDER_ACTIONS",
           extra: { kind: "task", itemId: t.id }
